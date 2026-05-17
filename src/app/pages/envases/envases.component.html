@@ -1,0 +1,188 @@
+<div class="envases-container">
+  <div class="header">
+    <h1>📦 Control de Envases y Depósitos</h1>
+    <button class="btn btn-primary" (click)="abrirModalRegistrar()">
+      ➕ Registrar Envase
+    </button>
+  </div>
+
+  @if (isLoading) {
+    <div class="card">
+      <div class="skeleton skeleton-title"></div>
+      <div class="skeleton skeleton-text"></div>
+      <div class="skeleton skeleton-text"></div>
+    </div>
+  } @else {
+    <!-- Tabla principal de envases agrupados por cliente -->
+    <div class="card">
+      <h3>📊 Envases Pendientes por Cliente</h3>
+
+      @if (clientesAgrupados.length === 0) {
+        <div class="empty-state">
+          <span class="empty-icon">📦</span>
+          <p>No hay envases pendientes</p>
+          <small>Los envases registrados aparecerán aquí</small>
+        </div>
+      } @else {
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>Cantidad Total</th>
+                <th>Monto Pendiente</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (cliente of clientesAgrupados; track cliente.clienteId) {
+                <tr>
+                  <td>
+                    <strong>{{ cliente.nombre }}</strong>
+                  </td>
+                  <td>
+                    <span class="badge badge-info">
+                      {{ cliente.cantidad_total }} envases
+                    </span>
+                  </td>
+                  <td>
+                    <strong class="text-warning">S/ {{ cliente.total_pendiente.toFixed(2) }}</strong>
+                  </td>
+                  <td>
+                    <button 
+                      class="btn btn-sm btn-secondary"
+                      (click)="verDetalles(cliente)"
+                    >
+                      👁️ Ver Detalles
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+
+    <!-- Historial de devoluciones -->
+    @if (devoluciones.length > 0) {
+      <div class="card">
+        <h3>✅ Historial de Devoluciones</h3>
+        
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Cliente</th>
+                <th>Descripción</th>
+                <th>Cantidad</th>
+                <th>Monto Devuelto</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (devolucion of devoluciones.slice(0, 10); track devolucion.id) {
+                <tr>
+                  <td>{{ formatearFecha(devolucion.fecha_devolucion) }}</td>
+                  <td>{{ devolucion.nombre_cliente }}</td>
+                  <td>{{ devolucion.descripcion }}</td>
+                  <td>
+                    <span class="badge badge-success">{{ devolucion.cantidad_devuelta }}</span>
+                  </td>
+                  <td>
+                    <strong class="text-success">S/ {{ devolucion.monto_devuelto.toFixed(2) }}</strong>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  }
+</div>
+
+<!-- Modal de Detalles del Cliente -->
+@if (modalAbierto() && clienteSeleccionado) {
+  <div class="modal-overlay" (click)="cerrarModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ clienteSeleccionado.nombre }}</h2>
+        <button class="btn-close" (click)="cerrarModal()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Resumen -->
+        <div class="resumen-envases">
+          <div class="resumen-item">
+            <span class="label">Total de Envases:</span>
+            <span class="value">{{ clienteSeleccionado.cantidad_total }}</span>
+          </div>
+          <div class="resumen-item">
+            <span class="label">Monto Total Pendiente:</span>
+            <span class="value text-warning">S/ {{ clienteSeleccionado.total_pendiente.toFixed(2) }}</span>
+          </div>
+        </div>
+
+        <hr>
+
+        <!-- Detalle de cada envase -->
+        <h4>📋 Detalle de Envases:</h4>
+        
+        <div class="envases-list">
+          @for (envase of clienteSeleccionado.envases; track envase.id) {
+            <div class="envase-card">
+              <div class="envase-info">
+                <div class="envase-header">
+                  <span class="envase-tipo">
+                    @if (envase.tipo === 'botella') {
+                      🍾
+                    } @else if (envase.tipo === 'caja_cerveza') {
+                      📦
+                    } @else {
+                      📦
+                    }
+                    {{ envase.descripcion }}
+                  </span>
+                  <span class="envase-fecha">{{ formatearFecha(envase.fecha_registro) }}</span>
+                </div>
+
+                <div class="envase-detalles">
+                  <div class="detalle-item">
+                    <span class="label">Cantidad:</span>
+                    <span class="value">{{ envase.cantidad }} unidades</span>
+                  </div>
+                  <div class="detalle-item">
+                    <span class="label">Precio/unidad:</span>
+                    <span class="value">S/ {{ envase.monto_por_unidad.toFixed(2) }}</span>
+                  </div>
+                  <div class="detalle-item">
+                    <span class="label">Total:</span>
+                    <span class="value text-warning">
+                      <strong>S/ {{ envase.monto_total.toFixed(2) }}</strong>
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="envase-actions">
+                <button 
+                  class="btn btn-sm btn-success"
+                  (click)="devolverEnvase(envase)"
+                >
+                  ✅ Devolver
+                </button>
+                <button 
+                  class="btn btn-sm btn-danger"
+                  (click)="envasesService.eliminarEnvase(envase.id)"
+                >
+                  🗑️
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+}

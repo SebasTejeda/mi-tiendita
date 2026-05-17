@@ -1,0 +1,202 @@
+<!-- src/app/pages/ventas/ventas.component.html -->
+
+<div class="ventas-container">
+  <!-- Layout Desktop: Grid de 2 columnas -->
+  <div class="ventas-grid">
+    <!-- ========== CATÁLOGO DE PRODUCTOS (Izquierda) ========== -->
+    <div class="catalogo-section">
+      <div class="catalogo-header">
+        <h1>🛒 Punto de Venta</h1>
+
+        <!-- Buscador -->
+        <div class="search-box">
+          <input
+            type="text"
+            [(ngModel)]="busqueda"
+            placeholder="🔍 Buscar producto..."
+            class="search-input"
+          />
+        </div>
+
+        <!-- Filtro por categoría -->
+        <div class="category-filter">
+          @for (categoria of categorias; track categoria) {
+            <button
+              class="category-btn"
+              [class.active]="categoriaSeleccionada === categoria"
+              (click)="categoriaSeleccionada = categoria"
+            >
+              {{ categoria }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Grid de Productos -->
+      <div class="productos-grid">
+        @if (isLoading) {
+          <!-- Estado de Carga -->
+          @for (i of [1, 2, 3, 4, 5, 6]; track i) {
+            <div class="producto-card skeleton">
+              <div class="skeleton skeleton-title"></div>
+              <div class="skeleton skeleton-text"></div>
+              <div class="skeleton skeleton-button"></div>
+            </div>
+          }
+        } @else if (productosFiltrados.length === 0) {
+          <!-- Estado Vacío -->
+          <div class="empty-state">
+            <p class="text-muted">No se encontraron productos</p>
+          </div>
+        } @else {
+          <!-- Estado con Datos -->
+          @for (producto of productosFiltrados; track producto.id) {
+            <div
+              class="producto-card"
+              [class.sin-stock]="producto.stock <= 0"
+              (click)="agregarAlCarrito(producto)"
+            >
+              <!-- Imagen -->
+              <div class="producto-imagen">
+                @if (producto.imagen_url) {
+                  <img [src]="producto.imagen_url" [alt]="producto.nombre" />
+                } @else {
+                  <div class="imagen-placeholder">
+                    <span class="placeholder-icon">📦</span>
+                    <span class="placeholder-text">Sin imagen</span>
+                  </div>
+                }
+
+                <!-- Badge de stock en la esquina -->
+                <div class="stock-badge">
+                  @if (producto.stock <= 0) {
+                    <span class="badge badge-danger">Agotado</span>
+                  } @else if (producto.es_faltante) {
+                    <span class="badge badge-warning">{{ producto.stock }}</span>
+                  } @else {
+                    <span class="badge badge-success">{{ producto.stock }}</span>
+                  }
+                </div>
+              </div>
+
+              <div class="producto-info">
+                <h3>{{ producto.nombre }}</h3>
+                <div class="categoria">
+                  <span class="categoria-badge">{{ producto.categoria }}</span>
+
+                  <!-- ✅ NUEVO: Badge de retornable -->
+                  @if (producto.es_retornable) {
+                    <span class="retornable-badge">🍾 Retornable</span>
+                  }
+                </div>
+                <p class="medida">{{ producto.valor_medida }} {{ producto.medida }}</p>
+
+                <div class="producto-footer">
+                  <span class="precio">S/ {{ producto.precio.toFixed(2) }}</span>
+                  <button
+                    class="btn-agregar"
+                    (click)="agregarAlCarrito(producto); $event.stopPropagation()"
+                  >
+                    ➕
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+        }
+      </div>
+    </div>
+
+    <!-- ========== CARRITO / TICKET (Derecha en Desktop) ========== -->
+    <div class="carrito-section" [class.carrito-visible]="carritoVisible()">
+      <div class="carrito-container">
+        <!-- Header del Carrito -->
+        <div class="carrito-header">
+          <h2>🧾 Ticket de Venta</h2>
+
+          <!-- Botón cerrar (solo móvil) -->
+          <button class="btn-close-mobile" (click)="carritoVisible.set(false)">✕</button>
+        </div>
+
+        <!-- Items del Carrito -->
+        <div class="carrito-items">
+          @if (carritoService.estaVacio()) {
+            <div class="carrito-vacio">
+              <p class="text-muted">🛒 Carrito vacío</p>
+              <p class="text-muted">Agrega productos para comenzar</p>
+            </div>
+          } @else {
+            @for (item of carritoService.items(); track item.productoId) {
+              <div class="carrito-item">
+                <div class="item-info">
+                  <h4>{{ item.producto }}</h4>
+                  <p class="item-precio">S/ {{ item.precio_unitario.toFixed(2) }}</p>
+                </div>
+
+                <div class="item-controls">
+                  <button
+                    class="btn-qty"
+                    (click)="carritoService.actualizarCantidad(item.productoId, item.cantidad - 1)"
+                  >
+                    −
+                  </button>
+                  <span class="qty">{{ item.cantidad }}</span>
+                  <button
+                    class="btn-qty"
+                    (click)="carritoService.actualizarCantidad(item.productoId, item.cantidad + 1)"
+                  >
+                    +
+                  </button>
+                  <button class="btn-remove" (click)="carritoService.eliminarItem(item.productoId)">
+                    🗑️
+                  </button>
+                </div>
+
+                <div class="item-subtotal">
+                  <strong>S/ {{ item.subtotal.toFixed(2) }}</strong>
+                </div>
+              </div>
+            }
+          }
+        </div>
+
+        <!-- Footer del Carrito -->
+        <div class="carrito-footer">
+          <div class="total-section">
+            <span class="total-label">Total:</span>
+            <span class="total-amount">S/ {{ carritoService.total().toFixed(2) }}</span>
+          </div>
+
+          <div class="carrito-actions">
+            <button
+              class="btn btn-secondary"
+              (click)="carritoService.vaciarCarrito()"
+              [disabled]="carritoService.estaVacio()"
+            >
+              Vaciar
+            </button>
+            <button
+              class="btn btn-success"
+              (click)="procesarVenta()"
+              [disabled]="carritoService.estaVacio()"
+            >
+              Cobrar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botón flotante del carrito (solo móvil) -->
+  <button
+    class="carrito-flotante"
+    (click)="carritoVisible.set(true)"
+    [class.tiene-items]="!carritoService.estaVacio()"
+  >
+    🛒 Ver Carrito
+    @if (!carritoService.estaVacio()) {
+      <span class="badge-count">{{ carritoService.cantidadItems() }}</span>
+    }
+  </button>
+</div>

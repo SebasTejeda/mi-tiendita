@@ -1,0 +1,235 @@
+<div class="inventario-container">
+  <div class="header-section">
+    <h1>📦 Inventario de Productos</h1>
+    <button class="btn btn-primary" (click)="abrirModalNuevo()">➕ Nuevo Producto</button>
+  </div>
+
+  @if (isLoading) {
+    <div class="card">
+      <div class="skeleton skeleton-title"></div>
+      <div class="skeleton skeleton-text"></div>
+      <div class="skeleton skeleton-text"></div>
+    </div>
+  } @else if (productos.length === 0) {
+    <div class="card text-center">
+      <p class="text-muted">No hay productos registrados</p>
+    </div>
+  } @else {
+    <div class="card">
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th (click)="ordenarPor('nombre')" class="sortable">
+                {{ ordenColumna === 'nombre' ? (ordenDireccion === 'asc' ? '↑' : '↓') : '' }}
+              </th>
+              <th (click)="ordenarPor('categoria')" class="sortable">
+                Categoría
+                {{ ordenColumna === 'categoria' ? (ordenDireccion === 'asc' ? '↑' : '↓') : '' }}
+              </th>
+              <th (click)="ordenarPor('precio')" class="sortable">
+                Precio {{ ordenColumna === 'precio' ? (ordenDireccion === 'asc' ? '↑' : '↓') : '' }}
+              </th>
+              <th>Medida</th>
+              <th (click)="ordenarPor('stock')" class="sortable">
+                Stock {{ ordenColumna === 'stock' ? (ordenDireccion === 'asc' ? '↑' : '↓') : '' }}
+              </th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (producto of productosOrdenados; track producto.id) {
+              <tr>
+                <td>
+                  <strong>{{ producto.nombre }}</strong>
+                </td>
+                <td>{{ producto.categoria }}</td>
+                <td>S/ {{ producto.precio.toFixed(2) }}</td>
+                <td>{{ producto.valor_medida }} {{ producto.medida }}</td>
+                <td>
+                  <span class="badge" [class]="getStockBadge(producto)">
+                    {{ producto.stock }}
+                  </span>
+                </td>
+                <td>
+                  <div class="action-buttons">
+                    <button class="btn btn-sm btn-secondary" (click)="abrirModalEditar(producto)">
+                      ✏️ Editar
+                    </button>
+                    <button class="btn btn-sm btn-danger" (click)="eliminarProducto(producto)">
+                      🗑️
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+
+  <!-- Modal -->
+  @if (modalAbierto()) {
+    <div class="modal-overlay" (click)="cerrarModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>{{ modoEdicion ? 'Editar Producto' : 'Nuevo Producto' }}</h2>
+          <button class="btn-close" (click)="cerrarModal()">✕</button>
+        </div>
+
+        <form [formGroup]="productoForm" (ngSubmit)="guardarProducto()">
+          <div class="form-group">
+            <label>Nombre del Producto</label>
+            <input type="text" formControlName="nombre" placeholder="Ej: Arroz Superior" />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="categoria">Categoría *</label>
+              <select id="categoria" formControlName="categoria">
+                <option value="">Selecciona una categoría</option>
+                @for (categoria of categorias; track categoria.id) {
+                  <option [value]="categoria.nombre">
+                    {{ categoria.icono ? categoria.icono + ' ' : '' }}{{ categoria.nombre }}
+                  </option>
+                }
+              </select>
+              @if (
+                productoForm.get('categoria')?.invalid && productoForm.get('categoria')?.touched
+              ) {
+                <span class="error">La categoría es requerida</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label>Precio (S/)</label>
+              <input type="number" formControlName="precio" step="0.01" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="medida">Medida *</label>
+              <select id="medida" formControlName="medida">
+                <option value="">Selecciona una medida</option>
+                @for (medida of medidas; track medida.id) {
+                  <option [value]="medida.nombre">
+                    {{ medida.nombre }} ({{ medida.abreviatura }})
+                  </option>
+                }
+              </select>
+              @if (productoForm.get('medida')?.invalid && productoForm.get('medida')?.touched) {
+                <span class="error">La medida es requerida</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label>Valor</label>
+              <input type="number" formControlName="valor_medida" step="0.01" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Stock Actual</label>
+              <input type="number" formControlName="stock" />
+            </div>
+
+            <div class="form-group">
+              <label>Stock Mínimo</label>
+              <input type="number" formControlName="stock_minimo" />
+            </div>
+          </div>
+
+          <!-- Campo de imagen existente -->
+          <div class="form-group form-group-imagen">
+            <label for="imagen_url">🖼️ Imagen del Producto</label>
+            <input
+              type="url"
+              id="imagen_url"
+              formControlName="imagen_url"
+              placeholder="https://ejemplo.com/producto.jpg"
+            />
+            <div class="helper-text">
+              💡 <strong>Tip:</strong> Busca el producto en Google Imágenes → Clic derecho en la
+              imagen → Copiar dirección de imagen
+            </div>
+
+            @if (productoForm.get('imagen_url')?.value) {
+              <div class="imagen-preview-container">
+                <p class="preview-label">Vista previa:</p>
+                <div class="imagen-preview">
+                  <img
+                    [src]="productoForm.get('imagen_url')?.value"
+                    [alt]="productoForm.get('nombre')?.value || 'Preview'"
+                    (error)="onImageError($event)"
+                  />
+                </div>
+              </div>
+            }
+          </div>
+
+          <!-- ✅ NUEVA SECCIÓN: ENVASE RETORNABLE -->
+          <div class="form-group form-group-envase">
+            <div class="envase-header">
+              <label class="checkbox-label">
+                <input
+                  type="checkbox"
+                  formControlName="es_retornable"
+                  (change)="onEnvaseChange()"
+                />
+                <span>🍾 Este producto tiene envase retornable</span>
+              </label>
+            </div>
+
+            @if (productoForm.get('es_retornable')?.value) {
+              <div class="envase-detalles">
+                <div class="envase-info-box">
+                  <p class="info-icon">ℹ️</p>
+                  <p class="info-text">
+                    Al vender este producto, se podrá registrar automáticamente el envase como
+                    depósito del cliente.
+                  </p>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="descripcion_envase">Descripción del Envase</label>
+                    <input
+                      type="text"
+                      id="descripcion_envase"
+                      formControlName="descripcion_envase"
+                      placeholder="Ej: Botella vidrio 1L"
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label for="precio_envase">Precio del Depósito (S/)</label>
+                    <input
+                      type="number"
+                      id="precio_envase"
+                      formControlName="precio_envase"
+                      placeholder="1.00"
+                      step="0.01"
+                      min="0"
+                    />
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" (click)="cerrarModal()">
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-success" [disabled]="productoForm.invalid">
+              {{ modoEdicion ? 'Actualizar' : 'Crear' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,347 @@
+.dashboard-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+  border-left: 4px solid;
+
+  h3 {
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+    color: var(--gray-600);
+  }
+
+  .amount {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  &.efectivo { border-left-color: var(--success); }
+  &.yape { border-left-color: #6b21a8; }
+  &.plin { border-left-color: #0891b2; }
+  &.fiado { border-left-color: var(--warning); }
+}
+
+.receptores-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.receptor-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem;
+  background: var(--gray-50);
+  border-radius: var(--radius-md);
+}
+
+.badge-efectivo { background: #c6f6d5; color: #22543d; }
+.badge-yape { background: #e9d5ff; color: #581c87; }
+.badge-plin { background: #cffafe; color: #164e63; }
+.badge-fiado { background: #feebc8; color: #7c2d12; }
+
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.detalle-pago {
+  display: block;
+  font-size: 0.75rem;
+  color: rgba(0, 0, 0, 0.6);
+  margin-top: 0.5rem;
+  font-weight: 500;
+}
+
+.text-success {
+  color: var(--success);
+}
+// ========== TABLA DE PAGOS DE FIADOS ==========
+.metodo-pago-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  align-items: flex-start;
+  
+  .badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-full);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  
+  .receptor-text {
+    font-size: 0.75rem;
+    color: var(--gray-600);
+    font-weight: 500;
+    margin-left: 0.25rem;
+  }
+}
+
+// Badges específicos para métodos de pago
+.badge-efectivo {
+  background: #c6f6d5;
+  color: #22543d;
+}
+
+.badge-yape {
+  background: #e9d5ff;
+  color: #581c87;
+}
+
+.badge-plin {
+  background: #cffafe;
+  color: #164e63;
+}
+
+.badge-fiado {
+  background: #feebc8;
+  color: #7c2d12;
+}
+
+// Estilos responsive para móvil
+@media (max-width: 768px) {
+  .metodo-pago-info {
+    .badge {
+      font-size: 0.7rem;
+      padding: 0.2rem 0.5rem;
+    }
+    
+    .receptor-text {
+      font-size: 0.7rem;
+    }
+  }
+}
+
+.payment-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 0.25rem;
+  vertical-align: middle;
+}
+
+.badge-yape {
+  background: #fff; // Color oficial de Yape
+  color: #000;
+}
+
+.badge-plin {
+  background: #fff; // Color oficial de Plin
+  color: #000;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+  border-left: 4px solid;
+
+  .stat-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    
+    h3 {
+      margin: 0;
+      font-size: 1rem;
+      color: var(--gray-600);
+    }
+  }
+
+  .payment-icon-large {
+    width: 32px;
+    height: 32px;
+  }
+
+  .icon-fiado {
+    font-size: 2rem;
+  }
+
+  .amount {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  &.efectivo { border-left-color: #16a34a; }
+  &.yape { border-left-color: #752F8A; }
+  &.plin { border-left-color: #00A7E1; }
+  &.fiado { border-left-color: var(--warning); }
+}
+
+// ========== TABLA DE VENTAS Y PAGOS ==========
+.metodo-pago-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  align-items: flex-start;
+  
+  .payment-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.75rem;
+    border-radius: var(--radius-full);
+    font-weight: 600;
+    font-size: 0.8rem;
+    gap: 0.35rem;
+    
+    .payment-icon {
+      width: 18px;
+      height: 18px;
+    }
+    
+    .emoji-icon {
+      font-size: 1rem;
+    }
+  }
+  
+  .payment-badge-efectivo {
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #86efac;
+  }
+
+  .payment-badge-yape {
+    background: #f3e8ff;
+    color: #6b21a8;
+    border: 1px solid #d8b4fe;
+  }
+
+  .payment-badge-plin {
+    background: #e0f2fe;
+    color: #0369a1;
+    border: 1px solid #7dd3fc;
+  }
+  
+  .payment-badge-fiado {
+    background: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fde68a;
+  }
+  
+  .receptor-text {
+    font-size: 0.75rem;
+    color: var(--gray-600);
+    font-weight: 500;
+    margin-left: 0.25rem;
+  }
+}
+
+.badge-secondary {
+  background: #e5e7eb;
+  color: #6b7280;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+// ========== RESPONSIVE ==========
+@media (max-width: 768px) {
+  .metodo-pago-info {
+    .payment-badge {
+      font-size: 0.75rem;
+      padding: 0.3rem 0.6rem;
+      
+      .payment-icon {
+        width: 16px;
+        height: 16px;
+      }
+      
+      .emoji-icon {
+        font-size: 0.9rem;
+      }
+    }
+    
+    .receptor-text {
+      font-size: 0.7rem;
+    }
+  }
+}
+
+// ========== TABLA GENERAL ==========
+.table-responsive {
+  overflow-x: auto;
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    
+    thead {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: white;
+      
+      th {
+        padding: 0.75rem 1rem;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        
+        &:first-child {
+          border-top-left-radius: var(--radius-md);
+        }
+        
+        &:last-child {
+          border-top-right-radius: var(--radius-md);
+        }
+      }
+    }
+    
+    tbody {
+      tr {
+        border-bottom: 1px solid var(--gray-200);
+        transition: background-color 0.2s;
+        
+        &:hover {
+          background: var(--gray-50);
+        }
+        
+        &:last-child {
+          border-bottom: none;
+        }
+        
+        td {
+          padding: 0.75rem 1rem;
+          font-size: 0.9rem;
+          color: var(--gray-700);
+          
+          strong {
+            color: var(--gray-900);
+            font-weight: 600;
+          }
+        }
+      }
+    }
+  }
+}
+
+.text-muted {
+  color: var(--gray-500);
+  font-style: italic;
+  padding: 2rem;
+  text-align: center;
+}

@@ -1,59 +1,152 @@
-# MiTiendita
+🏪 Mi Tiendita - Sistema POS e Inventario
+Sistema de Punto de Venta (POS) e Inventario diseñado específicamente para tiendas familiares, con interfaz responsive optimizada para escritorio y dispositivos móviles.
+🚀 Tecnologías
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.7.
+Frontend: Angular 18 (Standalone Components)
+Backend: Firebase (Authentication + Firestore)
+UI: CSS/SCSS puro (sin frameworks)
+Alertas: SweetAlert2
 
-## Development server
+✨ Características
+📊 Dashboard
 
-To start a local development server, run:
+Cuadre de caja diario
+Resumen de ventas por método de pago
+Desglose de transferencias por receptor
+Tabla de ventas del día
 
-```bash
-ng serve
-```
+🛒 Punto de Venta
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Catálogo de productos con búsqueda y filtros
+Carrito de compras reactivo
+Múltiples métodos de pago (Efectivo, Yape, Plin, Fiado)
+Descuento automático de stock
 
-## Code scaffolding
+📦 Inventario
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+CRUD completo de productos
+Ordenamiento dinámico por columnas
+Alertas visuales de stock bajo
+Gestión de medidas (Unidad, Kilo, Litro)
 
-```bash
-ng generate component component-name
-```
+👥 Clientes
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Registro de clientes
+Gestión de datos de contacto
 
-```bash
-ng generate --help
-```
+📔 Cuaderno de Fiados
 
-## Building
+Agrupación de deudas por cliente
+Historial de pagos
+Opciones de pago: ticket individual, abono parcial, pago total
+Modal con pestañas (Deudas Pendientes / Historial)
 
-To build the project run:
+📋 Requisitos Previos
 
-```bash
-ng build
-```
+Node.js 18+ y npm
+Angular CLI 18
+Cuenta de Firebase
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+🔧 Instalación
 
-## Running unit tests
+Clonar el repositorio
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+bashgit clone <tu-repo>
+cd mi-tiendita
 
-```bash
-ng test
-```
+Instalar dependencias
 
-## Running end-to-end tests
+bashnpm install
 
-For end-to-end (e2e) testing, run:
+Configurar Firebase
 
-```bash
-ng e2e
-```
+Crea un proyecto en Firebase Console
+Habilita Authentication (Email/Password)
+Crea una base de datos Firestore
+Copia las credenciales de configuración
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
 
-## Additional Resources
+Configurar variables de entorno
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Duplica environment.example.ts como environment.ts
+Pega tus credenciales de Firebase
+
+
+Crear usuario inicial
+
+Ve a Firebase Console → Authentication → Users
+Agrega un usuario manualmente con email y contraseña
+
+
+Iniciar servidor de desarrollo
+
+bashng serve
+
+Abrir en el navegador
+
+Navega a http://localhost:4200
+Inicia sesión con las credenciales del paso 5
+
+
+
+🏗️ Arquitectura
+Standalone Components
+100% componentes standalone (sin app.module.ts)
+Control Flow Moderno
+Uso exclusivo de @if, @for, @empty (nuevo en Angular 17+)
+Signals
+Reactividad con Signals combinados con RxJS para Firebase
+Lazy Loading
+Carga diferida de módulos con PreloadAllModules
+Guards
+Protección de rutas con guards funcionales
+📂 Estructura del Proyecto
+src/app/
+├── core/
+│   ├── guards/          # Protección de rutas
+│   ├── interfaces/      # Modelos TypeScript
+│   └── services/        # Servicios de Firebase
+├── pages/               # Componentes de páginas (lazy loaded)
+├── shared/
+│   └── layout/          # Layout principal con sidebar
+├── app.component.*      # Componente raíz
+├── app.routes.ts        # Configuración de rutas
+└── app.config.ts        # Configuración de providers
+🎨 Diseño Responsive
+
+Desktop (>768px): Sidebar fijo + contenido principal
+Mobile (≤768px):
+
+Sidebar como offcanvas (hamburguesa)
+Carrito como modal flotante inferior
+Layout optimizado para pantallas pequeñas
+
+
+
+🔒 Seguridad
+
+Autenticación requerida para todas las rutas internas
+Reglas de seguridad en Firestore
+Validación de formularios
+Manejo de errores
+
+📱 Modo Offline (Futuro)
+Planificado: PWA con service workers para funcionamiento offline
+🚢 Despliegue
+Firebase Hosting
+bashnpm run build
+firebase deploy --only hosting
+Vercel / Netlify
+
+Build command: ng build --configuration production
+Output directory: dist/mi-tiendita/browser
+
+🤝 Contribuciones
+Este es un proyecto familiar privado, pero acepta sugerencias vía issues.
+📄 Licencia
+Uso privado exclusivo para la tienda familiar.
+👨‍💻 Desarrollo
+Desarrollado con ❤️ para la tienda de la familia
+
+Versión: 1.0.0
+Última actualización: Mayo 2026

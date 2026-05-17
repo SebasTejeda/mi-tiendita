@@ -1,0 +1,246 @@
+<div class="configuracion-container">
+  <div class="header">
+    <h1>⚙️ Configuración del Sistema</h1>
+    <p class="subtitle">Solo el administrador puede modificar estas opciones</p>
+  </div>
+  <!-- ✅ NUEVO: Botón de inicialización -->
+  @if (mostrarBotonInicializar()) {
+    <div class="init-section">
+      <div class="card init-card">
+        <div class="init-content">
+          <div class="init-icon">🚀</div>
+          <div class="init-text">
+            <h3>Inicialización del Sistema</h3>
+            <p>
+              Si es la primera vez que usas el sistema, haz clic aquí para crear los datos
+              iniciales.
+            </p>
+          </div>
+          <button class="btn btn-init" (click)="inicializarDatos()">Inicializar Datos</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Tabs de navegación -->
+  <div class="tabs-container">
+    <button
+      class="tab-button"
+      [class.active]="tabActiva() === 'receptores'"
+      (click)="cambiarTab('receptores')"
+    >
+      👥 Receptores
+    </button>
+    <button
+      class="tab-button"
+      [class.active]="tabActiva() === 'categorias'"
+      (click)="cambiarTab('categorias')"
+    >
+      📂 Categorías
+    </button>
+    <button
+      class="tab-button"
+      [class.active]="tabActiva() === 'medidas'"
+      (click)="cambiarTab('medidas')"
+    >
+      📏 Medidas
+    </button>
+  </div>
+
+  @if (isLoading) {
+    <div class="card">
+      <div class="skeleton skeleton-title"></div>
+      <div class="skeleton skeleton-text"></div>
+      <div class="skeleton skeleton-text"></div>
+    </div>
+  } @else {
+    <!-- TAB: RECEPTORES -->
+    @if (tabActiva() === 'receptores') {
+      <div class="tab-content">
+        <div class="card">
+          <div class="card-header">
+            <h3>👥 Gestión de Receptores</h3>
+            <button class="btn btn-primary" (click)="agregarReceptor()">➕ Agregar Receptor</button>
+          </div>
+
+          <div class="info-box">
+            <p class="info-icon">ℹ️</p>
+            <p class="info-text">
+              Los receptores son las personas que pueden recibir pagos por Yape o Plin. Aparecerán
+              como opciones al registrar ventas o pagos de fiados.
+            </p>
+          </div>
+
+          @if (receptores.length === 0) {
+            <div class="empty-state">
+              <span class="empty-icon">👥</span>
+              <p>No hay receptores registrados</p>
+              <small>Agrega personas que pueden recibir pagos</small>
+            </div>
+          } @else {
+            <div class="items-grid">
+              @for (receptor of receptores; track receptor.id) {
+                <div class="item-card" [class.inactive]="!receptor.activo">
+                  <div class="item-info">
+                    <h4>{{ receptor.nombre }}</h4>
+                    <span class="item-status" [class.active]="receptor.activo">
+                      {{ receptor.activo ? 'Activo' : 'Inactivo' }}
+                    </span>
+                  </div>
+
+                  <div class="item-actions">
+                    <button
+                      class="btn-icon btn-edit"
+                      (click)="editarReceptor(receptor)"
+                      title="Editar"
+                    >
+                      ✏️
+                    </button>
+                    <button
+                      class="btn-icon btn-toggle"
+                      (click)="toggleReceptor(receptor)"
+                      [title]="receptor.activo ? 'Desactivar' : 'Activar'"
+                    >
+                      {{ receptor.activo ? '👁️' : '🚫' }}
+                    </button>
+                    <button
+                      class="btn-icon btn-delete"
+                      (click)="eliminarReceptor(receptor)"
+                      title="Eliminar"
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- TAB: CATEGORÍAS -->
+    @if (tabActiva() === 'categorias') {
+      <div class="tab-content">
+        <div class="card">
+          <div class="card-header">
+            <h3>📂 Gestión de Categorías</h3>
+            <button class="btn btn-primary" (click)="agregarCategoria()">
+              ➕ Agregar Categoría
+            </button>
+          </div>
+
+          <div class="info-box">
+            <p class="info-icon">ℹ️</p>
+            <p class="info-text">
+              Las categorías organizan tus productos en el inventario y punto de venta. No podrás
+              eliminar categorías que tengan productos asociados.
+            </p>
+          </div>
+
+          @if (categorias.length === 0) {
+            <div class="empty-state">
+              <span class="empty-icon">📂</span>
+              <p>No hay categorías registradas</p>
+              <small>Agrega categorías para organizar tus productos</small>
+            </div>
+          } @else {
+            <div class="items-grid">
+              @for (categoria of categorias; track categoria.id) {
+                <div class="item-card" [class.inactive]="!categoria.activo">
+                  <div class="item-info">
+                    <h4>
+                      @if (categoria.icono) {
+                        <span class="item-icon">{{ categoria.icono }}</span>
+                      }
+                      {{ categoria.nombre }}
+                    </h4>
+                    <span class="item-status" [class.active]="categoria.activo">
+                      {{ categoria.activo ? 'Activa' : 'Inactiva' }}
+                    </span>
+                  </div>
+
+                  <div class="item-actions">
+                    <button
+                      class="btn-icon btn-toggle"
+                      (click)="toggleCategoria(categoria)"
+                      [title]="categoria.activo ? 'Desactivar' : 'Activar'"
+                    >
+                      {{ categoria.activo ? '👁️' : '🚫' }}
+                    </button>
+                    <button
+                      class="btn-icon btn-delete"
+                      (click)="eliminarCategoria(categoria)"
+                      title="Eliminar"
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- TAB: MEDIDAS -->
+    @if (tabActiva() === 'medidas') {
+      <div class="tab-content">
+        <div class="card">
+          <div class="card-header">
+            <h3>📏 Gestión de Medidas</h3>
+            <button class="btn btn-primary" (click)="agregarMedida()">➕ Agregar Medida</button>
+          </div>
+
+          <div class="info-box">
+            <p class="info-icon">ℹ️</p>
+            <p class="info-text">
+              Las medidas definen cómo se venden tus productos (Unidad, Kilo, Litro, etc.). No
+              podrás eliminar medidas que tengan productos asociados.
+            </p>
+          </div>
+
+          @if (medidas.length === 0) {
+            <div class="empty-state">
+              <span class="empty-icon">📏</span>
+              <p>No hay medidas registradas</p>
+              <small>Agrega unidades de medida para tus productos</small>
+            </div>
+          } @else {
+            <div class="items-grid">
+              @for (medida of medidas; track medida.id) {
+                <div class="item-card" [class.inactive]="!medida.activo">
+                  <div class="item-info">
+                    <h4>{{ medida.nombre }}</h4>
+                    <span class="item-badge">{{ medida.abreviatura }}</span>
+                    <span class="item-status" [class.active]="medida.activo">
+                      {{ medida.activo ? 'Activa' : 'Inactiva' }}
+                    </span>
+                  </div>
+
+                  <div class="item-actions">
+                    <button
+                      class="btn-icon btn-toggle"
+                      (click)="toggleMedida(medida)"
+                      [title]="medida.activo ? 'Desactivar' : 'Activar'"
+                    >
+                      {{ medida.activo ? '👁️' : '🚫' }}
+                    </button>
+                    <button
+                      class="btn-icon btn-delete"
+                      (click)="eliminarMedida(medida)"
+                      title="Eliminar"
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
+  }
+</div>

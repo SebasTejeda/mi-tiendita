@@ -1,0 +1,63 @@
+<!-- src/app/shared/layout/layout.component.html -->
+
+<div class="layout">
+  <!-- Overlay para móvil -->
+  @if (isSidebarOpen()) {
+    <div class="overlay" (click)="closeSidebar()"></div>
+  }
+
+  <!-- Sidebar -->
+  <aside class="sidebar" [class.sidebar-open]="isSidebarOpen()">
+    <!-- Logo/Header -->
+    <div class="sidebar-header">
+      <h2>🏪 Mi Tiendita</h2>
+    </div>
+
+    <!-- Menú de navegación -->
+    <nav class="sidebar-nav">
+      @for (item of menuItems; track item.route) {
+        <a
+          [routerLink]="item.route"
+          routerLinkActive="active"
+          class="nav-item"
+          (click)="closeSidebar()"
+        >
+          <span class="nav-icon">{{ item.icon }}</span>
+          <span class="nav-label">{{ item.label }}</span>
+        </a>
+      }
+    </nav>
+
+    <!-- Footer del Sidebar -->
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar">👤</div>
+        <div class="user-details">
+          <p class="user-email">{{ authService.currentUser()?.email }}</p>
+        </div>
+      </div>
+      <button class="btn btn-danger btn-sm" (click)="logout()">
+        Cerrar Sesión
+      </button>
+    </div>
+  </aside>
+
+  <!-- Contenido principal -->
+  <div class="main-content">
+    <!-- Header superior (solo visible en móvil) -->
+    <header class="mobile-header">
+      <button class="hamburger" (click)="toggleSidebar()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <h1>Mi Tiendita</h1>
+      <div class="header-spacer"></div>
+    </header>
+
+    <!-- Área de contenido -->
+    <div class="content-wrapper">
+      <ng-content />
+    </div>
+  </div>
+</div>

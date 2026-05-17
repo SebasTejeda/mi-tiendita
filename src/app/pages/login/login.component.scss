@@ -1,0 +1,101 @@
+// src/app/pages/login/login.component.scss
+
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 1rem;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 450px;
+  background: white;
+  border-radius: 16px;
+  padding: 3rem 2.5rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  
+  .logo {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    animation: bounce 1s ease-in-out;
+  }
+  
+  h1 {
+    margin-bottom: 0.5rem;
+    color: var(--gray-800);
+    font-size: 2rem;
+  }
+  
+  p {
+    margin: 0;
+    color: var(--gray-500);
+    font-size: 0.95rem;
+  }
+}
+
+form {
+  .btn {
+    width: 100%;
+    margin-top: 1rem;
+  }
+}
+
+.login-footer {
+  margin-top: 2rem;
+  text-align: center;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--gray-200);
+  
+  p {
+    margin: 0;
+    color: var(--gray-500);
+    font-size: 0.85rem;
+  }
+}
+
+/* ========== ANIMACIONES ========== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+  .login-card {
+    padding: 2rem 1.5rem;
+  }
+  
+  .login-header {
+    .logo {
+      font-size: 3rem;
+    }
+    
+    h1 {
+      font-size: 1.75rem;
+    }
+  }
+}

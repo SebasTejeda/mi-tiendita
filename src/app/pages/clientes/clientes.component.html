@@ -1,0 +1,138 @@
+<!-- src/app/pages/clientes/clientes.component.html -->
+
+<div class="clientes-container">
+  
+  <!-- Header -->
+  <div class="header-section">
+    <h1>👥 Gestión de Clientes</h1>
+    <button class="btn btn-primary" (click)="abrirModalNuevo()">
+      ➕ Nuevo Cliente
+    </button>
+  </div>
+
+  <!-- Tabla de Clientes -->
+  @if (isLoading) {
+    <div class="card">
+      <div class="skeleton skeleton-title"></div>
+      <div class="skeleton skeleton-text"></div>
+      <div class="skeleton skeleton-text"></div>
+    </div>
+  } @else if (clientes.length === 0) {
+    <div class="card text-center">
+      <p class="text-muted">No hay clientes registrados</p>
+      <button class="btn btn-primary" (click)="abrirModalNuevo()">
+        Crear primer cliente
+      </button>
+    </div>
+  } @else {
+    <div class="card">
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Teléfono</th>
+              <th>Referencia</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (cliente of clientes; track cliente.id) {
+              <tr>
+                <td><strong>{{ cliente.nombre }}</strong></td>
+                <td>{{ cliente.telefono }}</td>
+                <td>{{ cliente.referencia || '-' }}</td>
+                <td>
+                  <div class="action-buttons">
+                    <button 
+                      class="btn btn-sm btn-secondary" 
+                      (click)="abrirModalEditar(cliente)"
+                    >
+                      ✏️ Editar
+                    </button>
+                    <button 
+                      class="btn btn-sm btn-danger" 
+                      (click)="eliminarCliente(cliente)"
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+
+  <!-- Modal -->
+  @if (modalAbierto()) {
+    <div class="modal-overlay" (click)="cerrarModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        
+        <!-- Header del Modal -->
+        <div class="modal-header">
+          <h2>{{ modoEdicion ? 'Editar Cliente' : 'Nuevo Cliente' }}</h2>
+          <button class="btn-close" (click)="cerrarModal()">✕</button>
+        </div>
+
+        <!-- Formulario -->
+        <form [formGroup]="clienteForm" (ngSubmit)="guardarCliente()">
+          
+          <div class="form-group">
+            <label for="nombre">Nombre Completo *</label>
+            <input 
+              type="text" 
+              id="nombre"
+              formControlName="nombre" 
+              placeholder="Ej: Juan Pérez"
+              [class.error]="clienteForm.get('nombre')?.invalid && clienteForm.get('nombre')?.touched"
+            />
+            @if (clienteForm.get('nombre')?.invalid && clienteForm.get('nombre')?.touched) {
+              <div class="error-message">El nombre es obligatorio</div>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="telefono">Teléfono *</label>
+            <input 
+              type="tel" 
+              id="telefono"
+              formControlName="telefono" 
+              placeholder="Ej: 987654321"
+              [class.error]="clienteForm.get('telefono')?.invalid && clienteForm.get('telefono')?.touched"
+            />
+            @if (clienteForm.get('telefono')?.invalid && clienteForm.get('telefono')?.touched) {
+              <div class="error-message">El teléfono es obligatorio</div>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="referencia">Referencia / Dirección</label>
+            <textarea 
+              id="referencia"
+              formControlName="referencia" 
+              placeholder="Ej: Casa verde, al lado del parque"
+              rows="3"
+            ></textarea>
+          </div>
+
+          <!-- Acciones del Modal -->
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" (click)="cerrarModal()">
+              Cancelar
+            </button>
+            <button 
+              type="submit" 
+              class="btn btn-success" 
+              [disabled]="clienteForm.invalid"
+            >
+              {{ modoEdicion ? 'Actualizar' : 'Crear' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>

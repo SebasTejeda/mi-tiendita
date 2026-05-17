@@ -1,0 +1,211 @@
+<!-- src/app/pages/fiados/fiados.component.html -->
+
+<div class="fiados-container">
+  <!-- Header -->
+  <div class="header-section">
+    <h1>📔 Cuaderno de Fiados</h1>
+  </div>
+
+  <!-- Tabla de Clientes con Deudas -->
+  @if (isLoading) {
+    <div class="card">
+      <div class="skeleton skeleton-title"></div>
+      <div class="skeleton skeleton-text"></div>
+      <div class="skeleton skeleton-text"></div>
+    </div>
+  } @else if (clientesAgrupados.length === 0) {
+    <div class="card text-center">
+      <p class="text-muted">✅ No hay deudas pendientes</p>
+    </div>
+  } @else {
+    <div class="card">
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Cliente</th>
+              <th>Cantidad de Tickets</th>
+              <th>Deuda Total</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (cliente of clientesAgrupados; track cliente.clienteId) {
+              <tr>
+                <td>
+                  <strong>{{ cliente.nombre }}</strong>
+                </td>
+                <td>
+                  <span class="badge badge-info">{{ cliente.cantidad_tickets }} tickets</span>
+                </td>
+                <td>
+                  <strong class="text-danger">S/ {{ cliente.deuda_total.toFixed(2) }}</strong>
+                </td>
+                <td>
+                  <button class="btn btn-sm btn-primary" (click)="verDetalles(cliente)">
+                    📋 Ver Detalles
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+
+  <!-- Modal de Detalles del Cliente -->
+  @if (modalAbierto() && clienteSeleccionado) {
+    <div class="modal-overlay" (click)="cerrarModal()">
+      <div class="modal-content modal-large" (click)="$event.stopPropagation()">
+        <!-- Header del Modal -->
+        <div class="modal-header">
+          <div>
+            <h2>{{ clienteSeleccionado.nombre }}</h2>
+            <p class="deuda-total">
+              Deuda Total: <strong>S/ {{ clienteSeleccionado.deuda_total.toFixed(2) }}</strong>
+            </p>
+          </div>
+          <button class="btn-close" (click)="cerrarModal()">✕</button>
+        </div>
+
+        <!-- Pestañas -->
+        <div class="tabs">
+          <button
+            class="tab-btn"
+            [class.active]="pestanaActiva === 'deudas'"
+            (click)="pestanaActiva = 'deudas'"
+          >
+            💳 Deudas Pendientes ({{ clienteSeleccionado.cantidad_tickets }})
+          </button>
+          <button
+            class="tab-btn"
+            [class.active]="pestanaActiva === 'historial'"
+            (click)="pestanaActiva = 'historial'"
+          >
+            📜 Historial de Pagos
+          </button>
+        </div>
+
+        <!-- Contenido de las Pestañas -->
+        <div class="tab-content">
+          <!-- Pestaña: Deudas Pendientes -->
+          <!-- Pestaña: Deudas Pendientes -->
+          @if (pestanaActiva === 'deudas') {
+            <div class="deudas-section">
+              <!-- Resumen de Deuda Total -->
+              <div class="resumen-deuda">
+                <h3>Deuda Total Acumulada</h3>
+                <p class="monto-total">S/ {{ clienteSeleccionado.deuda_total.toFixed(2) }}</p>
+                <p class="tickets-info">
+                  {{ clienteSeleccionado.cantidad_tickets }} tickets pendientes
+                </p>
+              </div>
+
+              <!-- Detalle de Tickets (solo informativo) -->
+              <div class="tickets-detalle">
+                <h4>📋 Detalle de Compras Fiadas:</h4>
+
+                @for (fiado of clienteSeleccionado.fiados; track fiado.id) {
+                  <div class="ticket-card-info">
+                    <div class="ticket-header">
+                      <span class="ticket-fecha">📅 {{ formatearFecha(fiado.fecha_fiado) }}</span>
+                      <div class="ticket-montos">
+                        @if (fiado.monto_original && fiado.monto_original > fiado.monto_deuda) {
+                          <span class="monto-original"
+                            >Original: S/ {{ fiado.monto_original.toFixed(2) }}</span
+                          >
+                        }
+                        <span class="ticket-monto"
+                          >Saldo: S/ {{ fiado.monto_deuda.toFixed(2) }}</span
+                        >
+                      </div>
+                    </div>
+
+                    <div class="ticket-productos">
+                      <strong>Productos:</strong>
+
+                      @if (fiado.productos_llevados && fiado.productos_llevados.length > 0) {
+                        <ul>
+                          @for (item of fiado.productos_llevados; track $index) {
+                            <li>
+                              <span class="producto-nombre">{{ item.producto }}</span>
+                              <span class="producto-cantidad">{{ item.cantidad }}x</span>
+                              <span class="producto-precio">S/ {{ item.subtotal.toFixed(2) }}</span>
+                            </li>
+                          }
+                        </ul>
+                      } @else {
+                        <p class="text-muted">Sin detalles de productos</p>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+
+              <!-- Sección de Pagos -->
+              <div class="pagos-section">
+                <h4>💰 Registrar Pago</h4>
+
+                <div class="opciones-pago">
+                  <!-- Opción 1: Pago Parcial -->
+                  <button class="btn btn-lg btn-primary btn-abono" (click)="abrirModalAbono()">
+                    💵 Registrar Abono Parcial
+                  </button>
+
+                  <!-- Opción 2: Liquidar Todo -->
+                  <button
+                    class="btn btn-lg btn-success btn-liquidar"
+                    (click)="liquidarDeudaTotal()"
+                  >
+                    ✅ Liquidar Toda la Deuda (S/ {{ clienteSeleccionado.deuda_total.toFixed(2) }})
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Pestaña: Historial de Pagos -->
+          @if (pestanaActiva === 'historial') {
+            <div class="historial-section">
+              @if (historial.length === 0) {
+                <p class="text-muted text-center">No hay pagos registrados</p>
+              } @else {
+                <div class="historial-lista">
+                  @for (pago of historial; track pago.id) {
+                    @if (pago.clienteId === clienteSeleccionado.clienteId) {
+                      <div class="pago-card">
+  <div class="pago-header">
+    <span class="pago-tipo badge badge-success">{{ pago.tipo_pago }}</span>
+    <span class="pago-fecha">{{ formatearFecha(pago.fecha_pago) }}</span>
+  </div>
+  
+  <div class="pago-detalles">
+    <div class="pago-monto">
+      <strong>S/ {{ pago.monto_pagado.toFixed(2) }}</strong>
+    </div>
+    
+    <!-- ✅ MOSTRAR MÉTODO Y RECEPTOR -->
+    <div class="pago-info">
+      <span class="metodo-badge" [class]="'metodo-' + pago.metodo_pago">
+        {{ pago.metodo_pago === 'efectivo' ? '💵' : pago.metodo_pago === 'yape' ? '📱' : '💳' }}
+        {{ pago.metodo_pago?.toUpperCase() }}
+      </span>
+      
+      @if (pago.receptor) {
+        <span class="receptor-info">→ {{ pago.receptor }}</span>
+      }
+    </div>
+  </div>
+</div>
+                    }
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>
