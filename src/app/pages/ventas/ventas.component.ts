@@ -16,7 +16,7 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './ventas.component.html',
-  styleUrl: './ventas.component.scss'
+  styleUrl: './ventas.component.scss',
 })
 export class VentasComponent implements OnInit, OnDestroy {
   productosService = inject(ProductosService);
@@ -30,7 +30,7 @@ export class VentasComponent implements OnInit, OnDestroy {
   productosFiltrados: Producto[] = [];
   clientes: Cliente[] = [];
   receptores: Receptor[] = []; // ✅ Nuevo
-  
+
   busqueda = '';
   categoriaSeleccionada = '';
   carritoVisible = signal(false);
@@ -53,35 +53,38 @@ export class VentasComponent implements OnInit, OnDestroy {
 
   cargarProductos(): void {
     this.isLoading = true;
-    this.productosService.obtenerProductos().subscribe(productos => {
-      this.productos = productos.filter(p => p.stock > 0);
+    this.productosService.obtenerProductos().subscribe((productos) => {
+      this.productos = productos.filter((p) => p.stock > 0);
       this.productosFiltrados = this.productos;
       this.isLoading = false;
     });
   }
 
   cargarClientes(): void {
-    this.clientesService.obtenerClientes().subscribe(clientes => {
+    this.clientesService.obtenerClientes().subscribe((clientes) => {
       this.clientes = clientes;
     });
   }
 
   // ✅ Nuevo método
   cargarReceptores(): void {
-    this.receptoresSubscription = this.configuracionService.obtenerReceptoresActivos().subscribe(receptores => {
-      this.receptores = receptores;
-    });
+    this.receptoresSubscription = this.configuracionService
+      .obtenerReceptoresActivos()
+      .subscribe((receptores) => {
+        this.receptores = receptores;
+      });
   }
 
   get categorias(): string[] {
-    const cats = [...new Set(this.productos.map(p => p.categoria))];
-    return cats.filter(c => c && c.trim() !== '');
+    const cats = [...new Set(this.productos.map((p) => p.categoria))];
+    return cats.filter((c) => c && c.trim() !== '');
   }
 
   filtrarProductos(): void {
-    this.productosFiltrados = this.productos.filter(p => {
+    this.productosFiltrados = this.productos.filter((p) => {
       const matchBusqueda = p.nombre.toLowerCase().includes(this.busqueda.toLowerCase());
-      const matchCategoria = !this.categoriaSeleccionada || p.categoria === this.categoriaSeleccionada;
+      const matchCategoria =
+        !this.categoriaSeleccionada || p.categoria === this.categoriaSeleccionada;
       return matchBusqueda && matchCategoria;
     });
   }
@@ -92,16 +95,11 @@ export class VentasComponent implements OnInit, OnDestroy {
   }
 
   agregarAlCarrito(producto: Producto): void {
-    this.carritoService.agregarProducto(
-      producto.id, 
-      producto.nombre, 
-      producto.precio, 
-      1
-    );
+    this.carritoService.agregarProducto(producto.id, producto.nombre, producto.precio, 1);
   }
 
   toggleCarrito(): void {
-    this.carritoVisible.update(v => !v);
+    this.carritoVisible.update((v) => !v);
   }
 
   async procesarVenta(): Promise<void> {
@@ -109,7 +107,7 @@ export class VentasComponent implements OnInit, OnDestroy {
       Swal.fire({
         icon: 'warning',
         title: 'Carrito vacío',
-        text: 'Agrega productos antes de procesar la venta'
+        text: 'Agrega productos antes de procesar la venta',
       });
       return;
     }
@@ -184,10 +182,10 @@ export class VentasComponent implements OnInit, OnDestroy {
       cancelButtonColor: '#a0aec0',
       didOpen: () => {
         const options = document.querySelectorAll('.payment-option');
-        
-        options.forEach(option => {
+
+        options.forEach((option) => {
           option.addEventListener('click', () => {
-            options.forEach(opt => opt.classList.remove('selected'));
+            options.forEach((opt) => opt.classList.remove('selected'));
             option.classList.add('selected');
             selectedMethod = option.getAttribute('data-value') || '';
           });
@@ -199,7 +197,7 @@ export class VentasComponent implements OnInit, OnDestroy {
           return false;
         }
         return selectedMethod;
-      }
+      },
     });
 
     if (!metodoPago) return;
@@ -211,11 +209,11 @@ export class VentasComponent implements OnInit, OnDestroy {
     // Paso 2: Si es Yape o Plin, preguntar receptor (DINÁMICO)
     if (metodoPago === 'yape' || metodoPago === 'plin') {
       let selectedReceptor = '';
-      
+
       // ✅ Usar receptores dinámicos
-      const opcionesReceptores = this.receptores.map(r => 
-        `<div class="receptor-option" data-value="${r.nombre}">${r.nombre}</div>`
-      ).join('');
+      const opcionesReceptores = this.receptores
+        .map((r) => `<div class="receptor-option" data-value="${r.nombre}">${r.nombre}</div>`)
+        .join('');
 
       const { value: receptorInput } = await Swal.fire({
         title: '¿A quién le llegó el dinero?',
@@ -255,10 +253,10 @@ export class VentasComponent implements OnInit, OnDestroy {
         confirmButtonColor: '#48bb78',
         didOpen: () => {
           const options = document.querySelectorAll('.receptor-option');
-          
-          options.forEach(option => {
+
+          options.forEach((option) => {
             option.addEventListener('click', () => {
-              options.forEach(opt => opt.classList.remove('selected'));
+              options.forEach((opt) => opt.classList.remove('selected'));
               option.classList.add('selected');
               selectedReceptor = option.getAttribute('data-value') || '';
             });
@@ -270,7 +268,7 @@ export class VentasComponent implements OnInit, OnDestroy {
             return false;
           }
           return selectedReceptor;
-        }
+        },
       });
 
       if (!receptorInput) return;
@@ -284,16 +282,16 @@ export class VentasComponent implements OnInit, OnDestroy {
           icon: 'warning',
           title: 'No hay clientes',
           text: 'Debes crear un cliente antes de fiar',
-          confirmButtonText: 'Entendido'
+          confirmButtonText: 'Entendido',
         });
         return;
       }
 
       let selectedCliente = '';
 
-      const opcionesHTML = this.clientes.map(c => 
-        `<div class="receptor-option" data-value="${c.id}">${c.nombre}</div>`
-      ).join('');
+      const opcionesHTML = this.clientes
+        .map((c) => `<div class="receptor-option" data-value="${c.id}">${c.nombre}</div>`)
+        .join('');
 
       const { value: clienteSeleccionado } = await Swal.fire({
         title: 'Seleccionar Cliente',
@@ -333,10 +331,10 @@ export class VentasComponent implements OnInit, OnDestroy {
         confirmButtonColor: '#48bb78',
         didOpen: () => {
           const options = document.querySelectorAll('.receptor-option');
-          
-          options.forEach(option => {
+
+          options.forEach((option) => {
             option.addEventListener('click', () => {
-              options.forEach(opt => opt.classList.remove('selected'));
+              options.forEach((opt) => opt.classList.remove('selected'));
               option.classList.add('selected');
               selectedCliente = option.getAttribute('data-value') || '';
             });
@@ -348,13 +346,13 @@ export class VentasComponent implements OnInit, OnDestroy {
             return false;
           }
           return selectedCliente;
-        }
+        },
       });
 
       if (!clienteSeleccionado) return;
 
       clienteId = clienteSeleccionado;
-      nombreCliente = this.clientes.find(c => c.id === clienteSeleccionado)?.nombre;
+      nombreCliente = this.clientes.find((c) => c.id === clienteSeleccionado)?.nombre;
     }
 
     // Paso 4: Confirmar venta
@@ -370,9 +368,13 @@ export class VentasComponent implements OnInit, OnDestroy {
           <hr style="margin: 1rem 0;">
           <p><strong>Items:</strong></p>
           <ul style="margin: 0; padding-left: 1.5rem;">
-            ${this.carritoService.items().map(item => 
-              `<li>${item.cantidad}x ${item.producto} - S/ ${item.subtotal.toFixed(2)}</li>`
-            ).join('')}
+            ${this.carritoService
+              .items()
+              .map(
+                (item) =>
+                  `<li>${item.cantidad}x ${item.producto} - S/ ${item.subtotal.toFixed(2)}</li>`,
+              )
+              .join('')}
           </ul>
         </div>
       `,
@@ -381,7 +383,7 @@ export class VentasComponent implements OnInit, OnDestroy {
       confirmButtonText: '✅ Confirmar',
       cancelButtonText: 'Cancelar',
       confirmButtonColor: '#48bb78',
-      cancelButtonColor: '#a0aec0'
+      cancelButtonColor: '#a0aec0',
     });
 
     if (!confirmacion.isConfirmed) return;
@@ -393,7 +395,7 @@ export class VentasComponent implements OnInit, OnDestroy {
         metodoPago as any,
         receptor,
         clienteId,
-        nombreCliente
+        nombreCliente,
       );
 
       // ✅ Verificar envases retornables si es fiado
@@ -403,7 +405,6 @@ export class VentasComponent implements OnInit, OnDestroy {
 
       this.carritoService.vaciarCarrito();
       this.carritoVisible.set(false);
-
     } catch (error) {
       console.error('Error en venta:', error);
     }
@@ -411,8 +412,8 @@ export class VentasComponent implements OnInit, OnDestroy {
 
   async verificarEnvasesRetornables(clienteId: string, nombreCliente: string): Promise<void> {
     const items = this.carritoService.items();
-    const productosConEnvase = items.filter(item => {
-      const producto = this.productos.find(p => p.nombre === item.producto);
+    const productosConEnvase = items.filter((item) => {
+      const producto = this.productos.find((p) => p.nombre === item.producto);
       return producto?.es_retornable;
     });
 
@@ -423,10 +424,12 @@ export class VentasComponent implements OnInit, OnDestroy {
       html: `
         <p>Esta venta incluye productos con envases retornables:</p>
         <ul style="text-align: left; padding-left: 2rem; margin: 1rem 0;">
-          ${productosConEnvase.map(item => {
-            const producto = this.productos.find(p => p.nombre === item.producto);
-            return `<li><strong>${item.cantidad}x ${producto?.descripcion_envase}</strong> - S/ ${((producto?.precio_envase || 0) * item.cantidad).toFixed(2)}</li>`;
-          }).join('')}
+          ${productosConEnvase
+            .map((item) => {
+              const producto = this.productos.find((p) => p.nombre === item.producto);
+              return `<li><strong>${item.cantidad}x ${producto?.descripcion_envase}</strong> - S/ ${((producto?.precio_envase || 0) * item.cantidad).toFixed(2)}</li>`;
+            })
+            .join('')}
         </ul>
         <p>¿Deseas registrar estos envases como depósito del cliente?</p>
       `,
@@ -434,13 +437,13 @@ export class VentasComponent implements OnInit, OnDestroy {
       showCancelButton: true,
       confirmButtonText: 'Sí, registrar envases',
       cancelButtonText: 'No, omitir',
-      confirmButtonColor: '#16a34a'
+      confirmButtonColor: '#16a34a',
     });
 
     if (!isConfirmed) return;
 
     for (const item of productosConEnvase) {
-      const producto = this.productos.find(p => p.nombre === item.producto);
+      const producto = this.productos.find((p) => p.nombre === item.producto);
       if (!producto || !producto.es_retornable) continue;
 
       await this.envasesService.registrarEnvase(
@@ -449,7 +452,7 @@ export class VentasComponent implements OnInit, OnDestroy {
         'botella',
         producto.descripcion_envase || producto.nombre,
         item.cantidad,
-        producto.precio_envase || 0
+        producto.precio_envase || 0,
       );
     }
 
@@ -458,7 +461,7 @@ export class VentasComponent implements OnInit, OnDestroy {
       title: 'Envases registrados',
       text: `Se registraron ${productosConEnvase.reduce((sum, item) => sum + item.cantidad, 0)} envases`,
       timer: 2500,
-      showConfirmButton: false
+      showConfirmButton: false,
     });
   }
 }

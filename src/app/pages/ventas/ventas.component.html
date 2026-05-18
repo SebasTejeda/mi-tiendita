@@ -9,10 +9,12 @@
         <h1>🛒 Punto de Venta</h1>
 
         <!-- Buscador -->
+        <!-- Buscador -->
         <div class="search-box">
           <input
             type="text"
             [(ngModel)]="busqueda"
+            (input)="filtrarProductos()"
             placeholder="🔍 Buscar producto..."
             class="search-input"
           />
@@ -20,16 +22,24 @@
 
         <!-- Filtro por categoría -->
         <div class="category-filter">
+          <button
+            class="category-btn"
+            [class.active]="categoriaSeleccionada === ''"
+            (click)="seleccionarCategoria('')"
+          >
+            Todos
+          </button>
           @for (categoria of categorias; track categoria) {
             <button
               class="category-btn"
               [class.active]="categoriaSeleccionada === categoria"
-              (click)="categoriaSeleccionada = categoria"
+              (click)="seleccionarCategoria(categoria)"
             >
               {{ categoria }}
             </button>
           }
         </div>
+
       </div>
 
       <!-- Grid de Productos -->
