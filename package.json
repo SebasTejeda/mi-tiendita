@@ -6,7 +6,10 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "build:prod": "ng build --configuration production",
+    "deploy": "npm run build:prod && firebase deploy --only hosting",
+    "deploy:preview": "npm run build:prod && firebase hosting:channel:deploy preview"
   },
   "private": true,
   "packageManager": "npm@11.12.1",
