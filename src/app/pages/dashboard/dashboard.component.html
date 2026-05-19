@@ -114,42 +114,98 @@
                   <td>
                     <!-- ✅ MÉTODO DE PAGO CON ICONOS Y RECEPTOR -->
                     <div class="metodo-pago-info">
-                      @if (venta.metodo_pago === 'efectivo') {
-                        <span class="payment-badge payment-badge-efectivo">
-                          <img
-                            src="https://cdn-icons-png.flaticon.com/512/438/438526.png"
-                            alt="Efectivo"
-                            class="payment-icon"
-                          />
-                          Efectivo
-                        </span>
-                      } @else if (venta.metodo_pago === 'yape') {
-                        <span class="payment-badge payment-badge-yape">
-                          <img src="https://vectorseek.com/wp-content/uploads/2023/09/Yape-App-Logo-Vector.svg-.png" alt="Yape" class="payment-icon" />
-                          Yape
-                        </span>
-                      } @else if (venta.metodo_pago === 'plin') {
-                        <span class="payment-badge payment-badge-plin">
-                          <img src="https://images.seeklogo.com/logo-png/38/2/plin-logo-png_seeklogo-386806.png" alt="Plin" class="payment-icon" />
-                          Plin
-                        </span>
-                      } @else if (venta.metodo_pago === 'fiado') {
-                        <span class="payment-badge payment-badge-fiado">
-                          <span class="emoji-icon">📔</span>
-                          Fiado
-                        </span>
+                      @if (venta.pagos && venta.pagos.length > 0) {
+                        <div style="display: flex; flex-direction: column; gap: 0.35rem">
+                          @for (pago of venta.pagos; track $index) {
+                            <div style="display: flex; align-items: center; gap: 0.5rem">
+                              @if (pago.metodo === 'efectivo') {
+                                <span class="payment-badge payment-badge-efectivo">
+                                  <img
+                                    src="https://cdn-icons-png.flaticon.com/512/438/438526.png"
+                                    alt="Efectivo"
+                                    class="payment-icon"
+                                  />
+                                  Efectivo
+                                </span>
+                              } @else if (pago.metodo === 'yape') {
+                                <span class="payment-badge payment-badge-yape">
+                                  <img
+                                    src="https://vectorseek.com/wp-content/uploads/2023/09/Yape-App-Logo-Vector.svg-.png"
+                                    alt="Yape"
+                                    class="payment-icon"
+                                  />
+                                  Yape
+                                </span>
+                              } @else if (pago.metodo === 'plin') {
+                                <span class="payment-badge payment-badge-plin">
+                                  <img
+                                    src="https://images.seeklogo.com/logo-png/38/2/plin-logo-png_seeklogo-386806.png"
+                                    alt="Plin"
+                                    class="payment-icon"
+                                  />
+                                  Plin
+                                </span>
+                              } @else if (pago.metodo === 'fiado') {
+                                <span
+                                  class="payment-badge payment-badge-fiado"
+                                  style="padding: 0.2rem 0.5rem; font-size: 0.8rem"
+                                  >📔 Fiado</span
+                                >
+                              }
+                              <strong style="font-size: 0.8rem"
+                                >S/ {{ pago.monto.toFixed(2) }}</strong
+                              >
+                              @if (pago.receptor) {
+                                <small class="receptor-text">→ {{ pago.receptor }}</small>
+                              }
+                              @if (pago.nombreCliente) {
+                                <small class="receptor-text">→ {{ pago.nombreCliente }}</small>
+                              }
+                            </div>
+                          }
+                        </div>
                       } @else {
-                        <span class="badge badge-secondary">❓ No especificado</span>
-                      }
+                        @if (venta.metodo_pago === 'efectivo') {
+                          <span class="payment-badge payment-badge-efectivo">
+                            <img
+                              src="https://cdn-icons-png.flaticon.com/512/438/438526.png"
+                              alt="Efectivo"
+                              class="payment-icon"
+                            />
+                            Efectivo
+                          </span>
+                        } @else if (venta.metodo_pago === 'yape') {
+                          <span class="payment-badge payment-badge-yape">
+                            <img
+                              src="https://vectorseek.com/wp-content/uploads/2023/09/Yape-App-Logo-Vector.svg-.png"
+                              alt="Yape"
+                              class="payment-icon"
+                            />
+                            Yape
+                          </span>
+                        } @else if (venta.metodo_pago === 'plin') {
+                          <span class="payment-badge payment-badge-plin">
+                            <img
+                              src="https://images.seeklogo.com/logo-png/38/2/plin-logo-png_seeklogo-386806.png"
+                              alt="Plin"
+                              class="payment-icon"
+                            />
+                            Plin
+                          </span>
+                        } @else if (venta.metodo_pago === 'fiado') {
+                          <span class="payment-badge payment-badge-fiado">
+                            <span class="emoji-icon">📔</span> Fiado
+                          </span>
+                        } @else {
+                          <span class="badge badge-secondary">❓ No especificado</span>
+                        }
 
-                      <!-- Mostrar receptor solo si existe -->
-                      @if (venta.receptor) {
-                        <small class="receptor-text">→ {{ venta.receptor }}</small>
-                      }
-
-                      <!-- Mostrar cliente si es fiado -->
-                      @if (venta.metodo_pago === 'fiado' && venta.nombre_cliente) {
-                        <small class="receptor-text">→ {{ venta.nombre_cliente }}</small>
+                        @if (venta.receptor) {
+                          <small class="receptor-text">→ {{ venta.receptor }}</small>
+                        }
+                        @if (venta.metodo_pago === 'fiado' && venta.nombre_cliente) {
+                          <small class="receptor-text">→ {{ venta.nombre_cliente }}</small>
+                        }
                       }
                     </div>
                   </td>

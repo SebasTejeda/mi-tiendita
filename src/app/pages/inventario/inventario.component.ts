@@ -39,6 +39,7 @@ export class InventarioComponent implements OnInit, OnDestroy {
   productoForm = this.fb.group({
     nombre: ['', Validators.required],
     categoria: ['', Validators.required],
+    precio_compra: [null as number | null, [Validators.min(0)]],
     precio: [0, [Validators.required, Validators.min(0.01)]],
     medida: ['', Validators.required],
     valor_medida: [1, [Validators.required, Validators.min(0.01)]],
@@ -119,6 +120,7 @@ export class InventarioComponent implements OnInit, OnDestroy {
     this.productoForm.reset({
       nombre: '',
       categoria: '',
+      precio_compra: null,
       precio: 0,
       medida: '',
       valor_medida: 1,
@@ -138,6 +140,7 @@ export class InventarioComponent implements OnInit, OnDestroy {
     this.productoForm.patchValue({
       nombre: producto.nombre,
       categoria: producto.categoria,
+      precio_compra: producto.precio_compra || null,
       precio: producto.precio,
       medida: producto.medida,
       valor_medida: producto.valor_medida,
@@ -176,6 +179,9 @@ async guardarProducto(): Promise<void> {
     stock_minimo: Number(formValue.stock_minimo ?? 5),
     es_faltante: false,
     fecha_creacion: Timestamp.now(),
+    ...(formValue.precio_compra !== null && formValue.precio_compra! > 0 
+      ? { precio_compra: Number(formValue.precio_compra) } 
+      : {}),
     // ✅ Cambiar de undefined a que no exista el campo si está vacío
     ...(formValue.imagen_url && formValue.imagen_url.trim() !== '' 
       ? { imagen_url: formValue.imagen_url.trim() } 
@@ -237,5 +243,24 @@ async guardarProducto(): Promise<void> {
 
   onImageError(event: any): void {
     event.target.src = 'https://via.placeholder.com/300x300/e5e7eb/6b7280?text=Imagen+no+disponible';
+  }
+
+  // 👇 NUEVA FUNCIÓN MATEMÁTICA
+  calcularGanancia(): string | null {
+    const costo = this.productoForm.get('precio_compra')?.value;
+    const venta = this.productoForm.get('precio')?.value;
+
+    if (!costo || !venta || costo <= 0 || venta <= 0) return null;
+
+    const ganancia = venta - costo;
+    
+    if (ganancia <= 0) {
+      return `<span style="color: #ef4444; font-weight: bold;">Atención: Sin ganancia o pérdida (S/ ${ganancia.toFixed(2)})</span>`;
+    }
+
+    // Calculamos el margen de ganancia sobre el precio de venta (estándar en retail)
+    const margen = (ganancia / venta) * 100; 
+
+    return `Ganancia neta: <strong>S/ ${ganancia.toFixed(2)}</strong> (<span style="color: #10b981; font-weight: bold;">+${margen.toFixed(1)}%</span> de margen)`;
   }
 }

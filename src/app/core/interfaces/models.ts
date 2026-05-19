@@ -42,6 +42,7 @@ export interface Producto {
   es_retornable: boolean;
   precio_envase?: number;
   descripcion_envase?: string;
+  precio_compra?: number;
 }
 
 // ========== CLIENTE ==========
@@ -66,11 +67,12 @@ export interface Venta {
   id: string;
   fecha: Timestamp;
   total: number;
-  metodo_pago: 'efectivo' | 'yape' | 'plin' | 'fiado';
-  receptor?: string; // A quién llegó el dinero (solo para yape/plin)
+  metodo_pago?: 'efectivo' | 'yape' | 'plin' | 'fiado'; // ✅ Mantener para compatibilidad
+  pagos?: PagoVenta[]; // ✅ NUEVO: Array de pagos múltiples
+  receptor?: string; // ✅ Mantener para compatibilidad con ventas antiguas
   items: ItemVenta[];
-  clienteId?: string; // Solo si es fiado
-  nombre_cliente?: string; // Solo si es fiado
+  clienteId?: string;
+  nombre_cliente?: string;
 }
 
 // ========== FIADO (Deuda Activa) ==========
@@ -142,4 +144,12 @@ export interface DevolucionEnvase {
   cantidad_devuelta: number;
   monto_devuelto: number;
   fecha_devolucion: Timestamp;
+}
+
+export interface PagoVenta {
+  metodo: 'efectivo' | 'yape' | 'plin';
+  monto: number;
+  receptor?: string; // Solo para yape/plin
+  clienteId?: string; // Solo para fiado
+  nombreCliente?: string; // Solo para fiado
 }
